@@ -1,9 +1,9 @@
 [project]
-name = "gui"
+name = "playing-with-plots"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "sqlalchemy>=2.0.40",
+    "matplotlib>=3.10.1",
 ]
