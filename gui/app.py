@@ -1,14 +1,23 @@
 import sys
 
 from database import Note, session
-from PySide6.QtWidgets import (QApplication, QSystemTrayIcon, QTextEdit, QHBoxLayout, 
- QVBoxLayout, QWidget, QPushButton, QMenu)
+from PySide6.QtWidgets import (
+    QApplication,
+    QSystemTrayIcon,
+    QTextEdit,
+    QHBoxLayout,
+    QVBoxLayout,
+    QWidget,
+    QPushButton,
+    QMenu,
+)
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon, QAction
 
 app = QApplication(sys.argv)
 
 active_notewindows = {}
+
 
 class StickyNotes(QWidget):
     def __init__(self, note=None):
@@ -19,24 +28,28 @@ class StickyNotes(QWidget):
             | Qt.WindowType.FramelessWindowHint
             | Qt.WindowType.WindowStaysOnTopHint
         )
-        self.setStyleSheet("background: yellow; color: black; border: 0; font-size: 12px")
+        self.setStyleSheet(
+            "background: yellow; color: black; border: 0; font-size: 12px"
+        )
         layout = QVBoxLayout()
-        
+
         buttons = QHBoxLayout()
         self.close_btn = QPushButton("x")
-        self.close_btn.setStyleSheet("font-weight: bold; font-size: 25px: width: 25px; height: 25px")
+        self.close_btn.setStyleSheet(
+            "font-weight: bold; font-size: 25px: width: 25px; height: 25px"
+        )
         self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.close_btn.clicked.connect(self.close)
         buttons.addStretch()
         buttons.addWidget(self.close_btn)
         layout.addLayout(buttons)
 
-        self.text = QTextEdit() 
+        self.text = QTextEdit()
         layout.addWidget(self.text)
         self.setLayout(layout)
 
         active_notewindows[id(self)] = self
-        
+
         if note is None:
             self.note = Note()
             self.save
@@ -70,11 +83,13 @@ class StickyNotes(QWidget):
         session.delete(self.note)
         session.commit()
         del active_notewindows[id(self)]
-        self.close()    
+        self.close()
 
-def create_notewindow():
-    note = StickyNotes()
+
+def create_notewindow(note=None):
+    note = StickyNotes(note=note)
     note.show()
+
 
 existing_notes = session.query(Note).all()
 
@@ -84,18 +99,20 @@ if existing_notes:
 else:
     create_notewindow()
 
-icon = QIcon("sticky_note2.png")
+icon = QIcon("sticky-notes.png")
 
 tray = QSystemTrayIcon()
 tray.setIcon(icon)
 tray.setVisible(True)
 
+
 def handle_tray_clicked(reason):
-    if(
-        QSystemTrayIcon.ActivationReason(reason) 
+    if (
+        QSystemTrayIcon.ActivationReason(reason)
         == QSystemTrayIcon.ActivationReason.Trigger
     ):
         create_notewindow()
+
 
 tray.activated.connect(handle_tray_clicked)
 
